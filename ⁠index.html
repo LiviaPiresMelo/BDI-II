@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BDI - Inventário de Depressão de Beck</title>
+  <style>
+    :root {
+      --primary: #122844;
+      --primary-light: #eef3f9;
+      --border-color: #d1d9e2;
+      --text-dark: #222a35;
+      --text-muted: #5e6d7e;
+      --highlight: #f59e0b;
+      --highlight-bg: #fff8e6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f3f5f9;
+      color: var(--text-dark);
+      padding: 20px 16px 140px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Header */
+    .header {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 24px 24px 20px;
+      text-align: left;
+    }
+
+    .header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 0.88rem;
+      opacity: 0.85;
+      font-weight: 300;
+    }
+
+    /* Form Body */
+    .content {
+      padding: 24px;
+    }
+
+    /* Identification Section */
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 4px;
+    }
+
+    .fields-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .field-group input {
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.95rem;
+      background: #fdfdfd;
+      outline: none;
+    }
+
+    .field-group input:focus {
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    /* Instructions */
+    .instructions {
+      background: var(--primary-light);
+      border-left: 4px solid var(--primary);
+      padding: 12px 14px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      line-height: 1.45;
+      margin-bottom: 28px;
+    }
+
+    /* Questions */
+    .question-card {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .question-card:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .question-header {
+      font-size: 0.96rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+    }
+
+    .options-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .option-item:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .option-item.selected {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: #e2e8f0;
+      color: var(--text-dark);
+      flex-shrink: 0;
+    }
+
+    .option-item.selected .score-badge {
+      background: #ffffff;
+      color: var(--primary);
+    }
+
+    .option-text {
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    /* Specific sub-question for item 19 */
+    .sub-item-box {
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Professional Footer Note */
+    .reference-box {
+      margin-top: 36px;
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .signature-box {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      text-align: center;
+    }
+
+    /* Fixed Bottom Results Bar */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--primary);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 -4px 18px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .bottom-bar-content {
+      max-width: 760px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .progress-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 0.85rem;
+    }
+
+    .progress-count {
+      opacity: 0.85;
+      font-size: 0.8rem;
+    }
+
+    .interpretation-text {
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .score-container {
+      background: #f59e0b;
+      color: #1a1a1a;
+      border-radius: 8px;
+      padding: 8px 18px;
+      text-align: center;
+      min-width: 110px;
+    }
+
+    .score-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .score-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>BDI — Inventário de Depressão de Beck</h1>
+    <p>Avaliação da Intensidade de Sintomas Depressivos</p>
+  </div>
+
+  <div class="content">
+    <div class="section-title">Identificação</div>
+    <div class="fields-grid">
+      <div class="field-group">
+        <label>Nome do(a) Paciente</label>
+        <input type="text" placeholder="Nome completo">
+      </div>
+      <div class="field-group">
+        <label>Data</label>
+        <input type="date" id="dateInput">
+      </div>
+    </div>
+
+    <div class="instructions">
+      <strong>Instruções:</strong> Este questionário consiste em 21 itens. Leia cada grupo de afirmações e toque na opção que melhor descreve como você tem se sentido na <strong>última semana, incluindo o dia de hoje</strong>.
+    </div>
+
+    <div id="questionsContainer"></div>
+
+    <div class="reference-box">
+      <strong>Pontos de Referência:</strong> 0 a 9 (Sintomas mínimos) | 10 a 18 (Leve a moderada) | 19 a 29 (Moderada a severa) | 30 a 63 (Severa).<br>
+      Interpretar os resultados sempre de forma integrada ao contexto clínico e anamnese detalhada.
+    </div>
+
+    <div class="signature-box">
+      Lívia Carvalho Pires Melo<br>
+      <span style="font-size: 0.78rem; font-weight: 400; color: var(--text-muted);">Psicóloga e Neuropsicóloga | CRP 11-04802 | @psi_liviamelo</span>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <div class="bottom-bar-content">
+    <div class="progress-info">
+      <div>Respondidos: <strong id="answeredCount">0</strong> / 21</div>
+      <div class="interpretation-text" id="statusLabel">Aguardando preenchimento</div>
+    </div>
+    <div class="score-container">
+      <div class="score-label">Escore Total</div>
+      <div class="score-value" id="totalScore">0</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Set current date by default
+  document.getElementById('dateInput').valueAsDate = new Date();
+
+  const bdiData = [
+    {
+      id: 1,
+      title: "1. Tristeza",
+      options: [
+        "Não me sinto triste",
+        "Eu me sinto triste",
+        "Estou sempre triste e não consigo sair disto",
+        "Estou tão triste ou infeliz que não consigo suportar"
+      ]
+    },
+    {
+      id: 2,
+      title: "2. Pessimismo",
+      options: [
+        "Não estou especialmente desanimado quanto ao futuro",
+        "Eu me sinto desanimado quanto ao futuro",
+        "Acho que nada tenho a esperar",
+        "Acho o futuro sem esperanças e tenho a impressão de que as coisas não podem melhorar"
+      ]
+    },
+    {
+      id: 3,
+      title: "3. Sensação de Fracasso",
+      options: [
+        "Não me sinto um fracasso",
+        "Acho que fracassei mais do que uma pessoa comum",
+        "Quando olho para trás na minha vida, vejo uma sucessão de fracassos",
+        "Acho que, como pessoa, sou um completo fracasso"
+      ]
+    },
+    {
+      id: 4,
+      title: "4. Anedonia / Insatisfação",
+      options: [
+        "Tenho tanto prazer em tudo como antes",
+        "Não sinto mais prazer nas coisas como antes",
+        "Não encontro um prazer real em mais nada",
+        "Estou insatisfeito ou aborrecido com tudo"
+      ]
+    },
+    {
+      id: 5,
+      title: "5. Culpa",
+      options: [
+        "Não me sinto especialmente culpado",
+        "Eu me sinto culpado grande parte do tempo",
+        "Eu me sinto culpado na maior parte do tempo",
+        "Eu me sinto sempre culpado"
+      ]
+    },
+    {
+      id: 6,
+      title: "6. Punição",
+      options: [
+        "Não acho que esteja sendo punido",
+        "Acho que posso ser punido",
+        "Creio que vou ser punido",
+        "Acho que estou sendo punido"
+      ]
+    },
+    {
+      id: 7,
+      title: "7. Autoestima",
+      options: [
+        "Não me sinto decepcionado comigo mesmo",
+        "Estou decepcionado comigo mesmo",
+        "Estou enojado de mim",
+        "Eu me odeio"
+      ]
+    },
+    {
+      id: 8,
+      title: "8. Autocrítica",
+      options: [
+        "Não me sinto de qualquer modo pior que os outros",
+        "Sou crítico em relação a mim por minhas fraquezas ou erros",
+        "Eu me culpo sempre por minhas falhas",
+        "Eu me culpo por tudo de mal que acontece"
+      ]
+    },
+    {
+      id: 9,
+      title: "9. Ideação Suicida",
+      options: [
+        "Não tenho quaisquer ideias de me matar",
+        "Tenho ideias de me matar, mas não as executaria",
+        "Gostaria de me matar",
+        "Eu me mataria se tivesse oportunidade"
+      ]
+    },
+    {
+      id: 10,
+      title: "10. Choro",
+      options: [
+        "Não choro mais que o habitual",
+        "Choro mais agora do que costumava",
+        "Agora, choro o tempo todo",
+        "Costumava ser capaz de chorar, mas agora não consigo, mesmo que queira"
+      ]
+    },
+    {
+      id: 11,
+      title: "11. Irritabilidade",
+      options: [
+        "Não sou mais irritado agora do que já fui",
+        "Fico aborrecido ou irritado mais facilmente do que costumava",
+        "Agora, eu me sinto irritado o tempo todo",
+        "Não me irrito mais com coisas que costumavam me irritar"
+      ]
+    },
+    {
+      id: 12,
+      title: "12. Retraimento Social",
+      options: [
+        "Não perdi o interesse pelas outras pessoas",
+        "Estou menos interessado pelas outras pessoas do que costumava estar",
+        "Perdi a maior parte do meu interesse pelas outras pessoas",
+        "Perdi todo o interesse pelas outras pessoas"
+      ]
+    },
+    {
+      id: 13,
+      title: "13. Indecisão",
+      options: [
+        "Tomo decisões tão bem quanto antes",
+        "Adio as tomadas de decisões mais do que costumava",
+        "Tenho mais dificuldades de tomar decisões do que antes",
+        "Absolutamente não consigo mais tomar decisões"
+      ]
+    },
+    {
+      id: 14,
+      title: "14. Imagem Corporal",
+      options: [
+        "Não acho que de qualquer modo pareço pior do que antes",
+        "Estou preocupado em estar parecendo velho ou sem atrativo",
+        "Acho que há mudanças permanentes na minha aparência que me fazem parecer sem atrativo",
+        "Acredito que pareço feio"
+      ]
+    },
+    {
+      id: 15,
+      title: "15. Inibição para o Trabalho",
+      options: [
+        "Posso trabalhar tão bem quanto antes",
+        "É preciso algum esforço extra para começar qualquer coisa",
+        "Tenho que me esforçar muito para fazer qualquer coisa",
+        "Não consigo mais fazer qualquer trabalho"
+      ]
+    },
+    {
+      id: 16,
+      title: "16. Sono",
+      options: [
+        "Consigo dormir tão bem como o habitual",
+        "Não durmo tão bem como costumava",
+        "Acordo 1 a 2 horas mais cedo do que habitualmente e acho difícil voltar a dormir",
+        "Acordo várias horas mais cedo do que costumava e não consigo voltar a dormir"
+      ]
+    },
+    {
+      id: 17,
+      title: "17. Fadiga",
+      options: [
+        "Não fico mais cansado do que o habitual",
+        "Fico cansado mais facilmente do que costumava",
+        "Fico cansado em fazer qualquer coisa",
+        "Estou cansado demais para fazer qualquer coisa"
+      ]
+    },
+    {
+      id: 18,
+      title: "18. Apetite",
+      options: [
+        "O meu apetite não está pior do que o habitual",
+        "Meu apetite não é tão bom como costumava ser",
+        "Meu apetite é muito pior agora",
+        "Absolutamente não tenho mais apetite"
+      ]
+    },
+    {
+      id: 19,
+      title: "19. Perda de Peso",
+      options: [
+        "Não tenho perdido muito peso se é que perdi algum recentemente",
+        "Perdi mais do que 2 quilos e meio",
+        "Perdi mais do que 5 quilos",
+        "Perdi mais do que 7 quilos"
+      ],
+      extra: true
+    },
+    {
+      id: 20,
+      title: "20. Preocupação Somática",
+      options: [
+        "Não estou mais preocupado com a minha saúde do que o habitual",
+        "Estou preocupado com problemas físicos, tais como dores, indisposição ou constipação",
+        "Estou muito preocupado com problemas físicos e é difícil pensar em outra coisa",
+        "Estou tão preocupado com meus problemas físicos que não consigo pensar em mais nada"
+      ]
+    },
+    {
+      id: 21,
+      title: "21. Perda de Libido",
+      options: [
+        "Não notei qualquer mudança recente no meu interesse por sexo",
+        "Estou menos interessado por sexo do que costumava",
+        "Estou muito menos interessado por sexo agora",
+        "Perdi completamente o interesse por sexo"
+      ]
+    }
+  ];
+
+  const answers = {};
+
+  function renderForm() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+
+    bdiData.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+
+      const title = document.createElement('div');
+      title.className = 'question-header';
+      title.textContent = item.title;
+      card.appendChild(title);
+
+      const optionsGrid = document.createElement('div');
+      optionsGrid.className = 'options-grid';
+
+      item.options.forEach((optText, score) => {
+        const option = document.createElement('div');
+        option.className = 'option-item';
+        option.dataset.qid = item.id;
+        option.dataset.score = score;
+
+        option.innerHTML = `
+          <span class="score-badge">${score}</span>
+          <span class="option-text">${optText}</span>
+        `;
+
+        option.addEventListener('click', () => {
+          answers[item.id] = score;
+          const siblings = optionsGrid.querySelectorAll('.option-item');
+          siblings.forEach(s => s.classList.remove('selected'));
+          option.classList.add('selected');
+          updateScores();
+        });
+
+        optionsGrid.appendChild(option);
+      });
+
+      card.appendChild(optionsGrid);
+
+      if (item.extra) {
+        const extraBox = document.createElement('div');
+        extraBox.className = 'sub-item-box';
+        extraBox.innerHTML = `
+          <span>Tentando perder peso de propósito?</span>
+          <label><input type="radio" name="diet" value="sim"> Sim</label>
+          <label><input type="radio" name="diet" value="nao"> Não</label>
+        `;
+        card.appendChild(extraBox);
+      }
+
+      container.appendChild(card);
+    });
+  }
+
+  function updateScores() {
+    let total = 0;
+    const answeredKeys = Object.keys(answers);
+    const count = answeredKeys.length;
+
+    answeredKeys.forEach(k => {
+      total += answers[k];
+    });
+
+    document.getElementById('totalScore').textContent = total;
+    document.getElementById('answeredCount').textContent = count;
+
+    let classification = "";
+    if (count === 0) {
+      classification = "Aguardando preenchimento";
+    } else if (total <= 9) {
+      classification = "Sintomas Mínimos / Sem depressão";
+    } else if (total <= 18) {
+      classification = "Depressão Leve a Moderada";
+    } else if (total <= 29) {
+      classification = "Depressão Moderada a Severa";
+    } else {
+      classification = "Depressão Severa";
+    }
+
+    document.getElementById('statusLabel').textContent = classification;
+  }
+
+  renderForm();
+</script>
+</body>
+</html>
